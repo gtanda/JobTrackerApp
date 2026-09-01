@@ -8,11 +8,13 @@ on:
     branches: [ "master" ]
     paths:
       - backend/**
+      - backend.Tests/**
       - .github/workflows/dotnet.yml
   pull_request:
     branches: [ "master" ]
     paths:
       - backend/**
+      - backend.Tests/**
       - .github/workflows/dotnet.yml
 
 jobs:
