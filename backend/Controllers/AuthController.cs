@@ -15,7 +15,7 @@ public class AuthController : ControllerBase
     {
         _authService = authService;
     }
-    
+
     [HttpPost("register")]
     public async Task<IActionResult> RegisterUser(RegisterUserDto dto)
     {
@@ -39,4 +39,17 @@ public class AuthController : ControllerBase
             _ => StatusCode(500, "Internal server error")
         };
     }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> RefreshToken(RefreshTokenRequestDto dto)
+    {
+        var refreshTokenResponse = await _authService.RefreshTokenAsync(dto);
+        if (refreshTokenResponse.Succeeded) return Ok(refreshTokenResponse.Response);
+        return refreshTokenResponse.Error switch
+        {
+            ErrorType.InvalidRefreshToken => Unauthorized("Invalid Refresh Token"),
+            _ => StatusCode(500, "Internal server error")
+        };
+    }
+
 }

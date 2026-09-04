@@ -3,5 +3,6 @@
 public enum ErrorType {
     None,
     EmailAlreadyExists,
-    InvalidCredentials
+    InvalidCredentials,
+    InvalidRefreshToken
 }

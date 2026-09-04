@@ -56,6 +56,19 @@ public class AuthService : IAuthService
         return AuthResult.Success(await IssueTokenAsync(user));
     }
 
+    public async Task<AuthResult> RefreshTokenAsync(RefreshTokenRequestDto dto)
+    {
+        var hashedToken = _tokenService.HashRefreshToken(dto.RefreshToken);
+        var existingToken = await _context.RefreshTokens
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(token => token.TokenHash == hashedToken);
+        
+        if (existingToken is null || existingToken.Expiration < DateTime.UtcNow) return AuthResult.Failure(ErrorType.InvalidRefreshToken);
+        
+        _context.RefreshTokens.Remove(existingToken);
+        return AuthResult.Success(await IssueTokenAsync(existingToken.User!));
+    }
+
     private async Task<AuthResponseDto> IssueTokenAsync(User user)
     {
         var tokenRes =  _tokenService.GenerateJwtToken(user);

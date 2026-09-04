@@ -45,13 +45,19 @@ public class TokenService : ITokenService
     public RefreshTokenResult GenerateRefreshToken()
     {
         var encodedToken = Convert.ToBase64String( RandomNumberGenerator.GetBytes(32));
-        var hashedToken = SHA256.HashData(Encoding.UTF8.GetBytes(encodedToken));
+        var hashedToken = HashRefreshToken(encodedToken);
         var refreshTokenResult = new RefreshTokenResult
         {
             RawToken = encodedToken,
-            HashedToken = Convert.ToBase64String(hashedToken),
+            HashedToken = hashedToken,
             Expires = DateTime.UtcNow.AddDays(7)
         };
         return refreshTokenResult;
+    }
+
+    public string HashRefreshToken(string rawToken)
+    {
+        var hashedToken = SHA256.HashData(Encoding.UTF8.GetBytes(rawToken));
+        return Convert.ToBase64String(hashedToken);
     }
 }

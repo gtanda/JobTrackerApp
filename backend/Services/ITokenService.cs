@@ -6,4 +6,5 @@ public interface ITokenService
 {
     public AccessTokenResult GenerateJwtToken(User user);
     public RefreshTokenResult GenerateRefreshToken();
+    public string HashRefreshToken(string rawToken);
 }
