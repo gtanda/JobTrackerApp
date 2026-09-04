@@ -1,6 +1,8 @@
-﻿using backend.Data;
+﻿using System.Security.Claims;
+using backend.Data;
 using backend.Models.DTOs;
 using backend.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +11,7 @@ namespace backend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class JobEntriesController : ControllerBase
 {
     private readonly JobTrackerContext _context;
@@ -21,8 +24,12 @@ public class JobEntriesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<JobEntryResponseDto>>> GetJobEntriesAsync()
     {
+        var userId = ParseUserId(User);
         var fetchedJobEntries =
-            await _context.JobEntries.Select(jobEntry => CreateJobEntryResponseDto(jobEntry)).ToListAsync();
+            await _context.JobEntries
+                .Where(jobEntry => jobEntry.UserId == userId)
+                .Select(jobEntry => CreateJobEntryResponseDto(jobEntry))
+                .ToListAsync();
         
         return Ok(fetchedJobEntries);
     }
@@ -32,8 +39,8 @@ public class JobEntriesController : ControllerBase
     public async Task<ActionResult<JobEntryResponseDto>> GetJobEntryByIdAsync(Guid id)
     {
         var jobEntry = await _context.JobEntries.FindAsync(id);
-
-        if (jobEntry is null)
+        var userId = ParseUserId(User);
+        if (jobEntry is null || jobEntry.UserId != userId)
         {
             return NotFound();
         }
@@ -46,7 +53,7 @@ public class JobEntriesController : ControllerBase
     {
         var newJobEntry = new JobEntry
         {
-            UserId = Guid.Parse("01a05b30-2eb1-7cb3-a98e-201342296a9f"), // TEMP
+            UserId = ParseUserId(User),
             CompanyName = jobEntry.CompanyName,
             JobTitle = jobEntry.JobTitle,
             DateApplied = jobEntry.DateApplied,
@@ -70,8 +77,8 @@ public class JobEntriesController : ControllerBase
     public async Task<IActionResult> DeleteJobEntryAsync(Guid id)
     {
         var jobEntryToRemove =  await _context.JobEntries.FindAsync(id);
-
-        if (jobEntryToRemove is null)
+        var userId =  ParseUserId(User);
+        if (jobEntryToRemove is null || jobEntryToRemove.UserId != userId)
         {
             return NotFound();
         }
@@ -84,13 +91,18 @@ public class JobEntriesController : ControllerBase
     public async Task<IActionResult> UpdateJobEntryAsync(Guid id, UpdateJobEntryDto jobEntry)
     {
         var jobEntryToUpdate = await _context.JobEntries.FindAsync(id);
-        
-        if (jobEntryToUpdate is null) return NotFound();
+        var userId = ParseUserId(User);
+        if (jobEntryToUpdate is null || jobEntryToUpdate.UserId != userId) return NotFound();
         
         _context.Entry(jobEntryToUpdate).CurrentValues.SetValues(jobEntry);
         
         await _context.SaveChangesAsync();
         return NoContent();
+    }
+
+    private static Guid ParseUserId(ClaimsPrincipal claimsPrincipal)
+    {
+        return  Guid.Parse(claimsPrincipal.FindFirstValue(ClaimTypes.NameIdentifier) ?? throw new InvalidOperationException("Claim principal is missing."));
     }
 
     private static JobEntryResponseDto CreateJobEntryResponseDto(JobEntry jobEntry)
