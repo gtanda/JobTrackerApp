@@ -1,11 +1,9 @@
 ﻿using backend.Data;
-using backend.Models.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using Org.BouncyCastle.Bcpg;
 using Respawn;
 using Testcontainers.PostgreSql;
 
@@ -43,17 +41,6 @@ public class JobTrackerWebApplicationFactory : WebApplicationFactory<Program>, I
         {
             await _respawner.ResetAsync(_connection);
         }
-   
-        using var scope = Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<JobTrackerContext>();
-        var newUser = new User
-        {
-            UserId = Guid.Parse("01a05b30-2eb1-7cb3-a98e-201342296a9f"),
-            Email = "testemail@email.ca",
-            CreatedAt = DateTime.UtcNow,
-        };
-        context.Users.Add(newUser);
-        await context.SaveChangesAsync();
     }
 
     async Task IAsyncLifetime.DisposeAsync()
