@@ -1,4 +1,7 @@
 using backend.Data;
+using backend.Models.Entities;
+using backend.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -11,6 +14,9 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<JobTrackerContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("JobTrackerDB")));
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 var app = builder.Build();
 
