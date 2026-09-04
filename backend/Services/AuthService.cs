@@ -56,9 +56,9 @@ public class AuthService : IAuthService
         return AuthResult.Success(await IssueTokenAsync(user));
     }
 
-    public async Task<AuthResult> RefreshTokenAsync(RefreshTokenRequestDto dto)
+    public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
     {
-        var hashedToken = _tokenService.HashRefreshToken(dto.RefreshToken);
+        var hashedToken = _tokenService.HashRefreshToken(refreshToken);
         var existingToken = await _context.RefreshTokens
             .Include(x => x.User)
             .FirstOrDefaultAsync(token => token.TokenHash == hashedToken);
@@ -69,17 +69,10 @@ public class AuthService : IAuthService
         return AuthResult.Success(await IssueTokenAsync(existingToken.User!));
     }
 
-    private async Task<AuthResponseDto> IssueTokenAsync(User user)
+    private async Task<AuthTokens> IssueTokenAsync(User user)
     {
         var tokenRes =  _tokenService.GenerateJwtToken(user);
         var refreshTokenRes = _tokenService.GenerateRefreshToken();
-        var authResponseDto = new AuthResponseDto
-        {
-            AccessToken = tokenRes.AccessToken,
-            RefreshToken = refreshTokenRes.RawToken,
-            TokenExpiration = tokenRes.TokenExpiration
-        };
-
         var refreshToken = new RefreshToken
         {
             TokenHash = refreshTokenRes.HashedToken,
@@ -89,6 +82,6 @@ public class AuthService : IAuthService
         };
         _context.RefreshTokens.Add(refreshToken); 
         await _context.SaveChangesAsync();
-        return authResponseDto;
+        return new AuthTokens {AccessToken = tokenRes.AccessToken, RawRefreshToken= refreshTokenRes.RawToken, Expires = tokenRes.TokenExpiration};
     }
 }
