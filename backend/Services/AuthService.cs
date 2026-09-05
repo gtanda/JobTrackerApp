@@ -64,9 +64,17 @@ public class AuthService : IAuthService
             .FirstOrDefaultAsync(token => token.TokenHash == hashedToken);
         
         if (existingToken is null || existingToken.Expiration < DateTime.UtcNow) return AuthResult.Failure(ErrorType.InvalidRefreshToken);
+
+        try
+        {
+            _context.RefreshTokens.Remove(existingToken);
+            return AuthResult.Success(await IssueTokenAsync(existingToken.User!));
+        }
+        catch (DbUpdateConcurrencyException ex)
+        {
+            return AuthResult.Failure(ErrorType.InvalidRefreshToken);
+        }
         
-        _context.RefreshTokens.Remove(existingToken);
-        return AuthResult.Success(await IssueTokenAsync(existingToken.User!));
     }
 
     private async Task<AuthTokens> IssueTokenAsync(User user)

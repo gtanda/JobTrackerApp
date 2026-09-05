@@ -1,9 +1,10 @@
 ﻿import {useContext, useState} from "react";
 import * as React from "react";
-import {AuthContext} from "./AuthContext.tsx";
+import {AuthContext} from "../Auth/AuthContext.tsx";
+
 
 export default function Login() {
-    const {accessToken, setAccessToken} = useContext(AuthContext)
+    const {setAccessToken} = useContext(AuthContext)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [errorState, setErrorState] = useState('');
