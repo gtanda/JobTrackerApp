@@ -1,15 +1,15 @@
 ﻿import * as React from "react";
-import {useContext, useState} from "react";
-import {AuthContext} from "../Auth/AuthContext.tsx";
+import {useState} from "react";
 import {createJobEntry} from "../../api/jobEntry.ts";
 import type {CreateJobEntry} from "../../types/jobEntry.ts";
+import useAuthFetch from "../Auth/useAuthFetch.tsx";
 
 interface CreateJobEntryFormProps {
     onCreated: () => void;
 }
 
 export default function CreateJobEntryForm({onCreated}: CreateJobEntryFormProps) {
-    const {accessToken} = useContext(AuthContext);
+    const {authFetch} = useAuthFetch();
     const [error, setErrorState] = useState<string>('');
     const [form, setForm] = useState({
         companyName: "",
@@ -24,11 +24,11 @@ export default function CreateJobEntryForm({onCreated}: CreateJobEntryFormProps)
         setErrorState('');
         const newJobEntry: CreateJobEntry = {companyName: form.companyName, jobTitle: form.jobTitle}
         try {
-            await createJobEntry(newJobEntry, accessToken);
+            await createJobEntry(newJobEntry, authFetch);
             onCreated();
             setForm({companyName: "", jobTitle: ""});
-        } catch (error) {
-            setErrorState(error instanceof Error ? error.message : "Could not create job entry");
+        } catch (err) {
+            setErrorState(err instanceof Error ? err.message : "Could not create job entry");
         }
 
     }

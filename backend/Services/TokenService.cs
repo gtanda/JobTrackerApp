@@ -22,7 +22,7 @@ public class TokenService : ITokenService
     public AccessTokenResult GenerateJwtToken(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_jwtKey);
+        var key = Encoding.UTF8.GetBytes(_jwtKey);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString())}),
