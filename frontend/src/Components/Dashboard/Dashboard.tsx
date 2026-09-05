@@ -3,6 +3,7 @@ import {AuthContext} from "../Auth/AuthContext.tsx";
 import {fetchJobEntries} from "../../api/jobEntry.ts";
 import type {JobEntry} from "../../types/jobEntry.ts";
 import JobEntryList from "./JobEntryList.tsx";
+import CreateJobEntryForm from "./CreateJobEntryForm.tsx";
 
 export default function Dashboard() {
     const [jobEntries, setJobEntries] = useState<JobEntry[]>([]);
@@ -10,23 +11,22 @@ export default function Dashboard() {
     const [hasError, setHasError] = useState(false);
     const {accessToken} = useContext(AuthContext);
 
-    useEffect(() => {
 
-        const fetchData = async () => {
-            setIsLoading(true);
-            setHasError(false);
-            try {
-                const data = await fetchJobEntries(accessToken);
-                setJobEntries(data);
-            } catch (error) {
-                setHasError(true);
-            } finally {
-                setIsLoading(false);
-            }
-
-
+    const loadEntries = async () => {
+        setIsLoading(true);
+        setHasError(false);
+        try {
+            const data = await fetchJobEntries(accessToken);
+            setJobEntries(data);
+        } catch (error) {
+            setHasError(true);
+        } finally {
+            setIsLoading(false);
         }
-        fetchData();
+    }
+
+    useEffect(() => {
+        loadEntries();
     }, [])
 
     return (
@@ -34,6 +34,7 @@ export default function Dashboard() {
             {hasError && <p>Something went wrong...</p>}
             {isLoading && <p>Loading...</p>}
             <p>You're logged in!</p>
+            <CreateJobEntryForm onCreated={loadEntries}/>
             <JobEntryList jobEntries={jobEntries}/>
         </>
     )
