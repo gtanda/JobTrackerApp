@@ -1,7 +1,9 @@
-﻿import {useState} from "react";
+﻿import {useContext, useState} from "react";
 import * as React from "react";
+import {AuthContext} from "./AuthContext.tsx";
 
 export default function Login() {
+    const {accessToken, setAccessToken} = useContext(AuthContext)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [errorState, setErrorState] = useState('');
@@ -11,11 +13,13 @@ export default function Login() {
         const response = await fetch("/api/Auth/login", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
+            credentials: "include",
             body: JSON.stringify({email, password})
         });
         if (response.ok){
             const responseJson = await response.json()
-            console.log(responseJson); 
+            setAccessToken(responseJson.accessToken);
+            console.log(responseJson.accessToken);
         } else {
             setErrorState("Login failed.");
         }
