@@ -1,6 +1,6 @@
-﻿type ApplicationStatus = "NotApplied" | "Applied" | "InterviewRequested" | "Interviewing" |
+﻿export type ApplicationStatus = "NotApplied" | "Applied" | "InterviewRequested" | "Interviewing" |
     "Offer" | "Rejected" | "AutoRejected" | "NoResponse"
-type JobSource = "CompanyWebsite" | "LinkedIn" | "Indeed" | "Referral" | "Recruiter" |
+export type JobSource = "CompanyWebsite" | "LinkedIn" | "Indeed" | "Referral" | "Recruiter" |
     "JobBoard" | "Other"
 
 export interface JobEntry {
@@ -32,4 +32,20 @@ export interface CreateJobEntry {
     recruiterName?: string | null;
     recruiterEmail?: string | null;
     interviewDate?: string | null;
+}
+
+
+export interface JobEntryFormState {
+    companyName: string;
+    jobTitle: string;
+    applicationStatus: ApplicationStatus | "";
+    jobSource: JobSource | "";
+    notes: string;
+    dateApplied: string;
+    postingUrl: string;
+    salaryMin: string;
+    salaryMax: string;
+    recruiterName: string;
+    recruiterEmail: string;
+    interviewDate: string;
 }
