@@ -7,5 +7,6 @@ interface AuthContextType {
 
 export const AuthContext = createContext<AuthContextType>({
     accessToken: '',
-    setAccessToken: () => {}
+    setAccessToken: () => {
+    }
 });

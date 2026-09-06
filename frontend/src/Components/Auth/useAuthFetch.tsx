@@ -1,6 +1,6 @@
 ﻿import {useContext} from "react";
 import {AuthContext} from "./AuthContext.tsx";
-import {refreshToken} from "../../api/authFetch.ts";
+import {getFreshAccessToken} from "../../api/authFetch.ts";
 
 export type AuthFetchType = (path: string, options: RequestInit) => Promise<Response>;
 
@@ -15,11 +15,11 @@ export default function useAuthFetch() {
             });
 
             if (response.status === 401) {
-                const data = await refreshToken()
-                setAccessToken(data.accessToken)
+                const newToken = await getFreshAccessToken()
+                setAccessToken(newToken)
                 return await fetch(path, {
                     ...options,
-                    headers: {...options.headers, Authorization: `Bearer ${data.accessToken}`},
+                    headers: {...options.headers, Authorization: `Bearer ${newToken}`},
                 });
             } else {
                 return response;
