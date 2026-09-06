@@ -2,7 +2,7 @@
 import {useState} from "react";
 import {createJobEntry} from "../../api/jobEntry.ts";
 import type {CreateJobEntry} from "../../types/jobEntry.ts";
-import useAuthFetch from "../Auth/useAuthFetch.tsx";
+import useAuthFetch from "../Auth/useAuthFetch.ts";
 
 interface CreateJobEntryFormProps {
     onCreated: () => void;
