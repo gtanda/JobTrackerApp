@@ -5,18 +5,21 @@ import {getFreshAccessToken} from "../../api/authToken.ts";
 export type AuthFetchType = (path: string, options: RequestInit) => Promise<Response>;
 
 export default function useAuthFetch() {
-    const {accessToken, setAccessToken} = useContext(AuthContext);
+    const {updateAndSetAccessToken, getAccessToken} = useContext(AuthContext);
+
 
     const authFetch = async (path: string, options: RequestInit) => {
         try {
+            const currentToken = getAccessToken();
             const response = await fetch(path, {
                 ...options,
-                headers: {...options.headers, Authorization: `Bearer ${accessToken}`},
+                headers: {...options.headers, Authorization: `Bearer ${currentToken}`},
             });
 
             if (response.status === 401) {
                 const newToken = await getFreshAccessToken()
-                setAccessToken(newToken)
+
+                updateAndSetAccessToken(newToken)
                 return await fetch(path, {
                     ...options,
                     headers: {...options.headers, Authorization: `Bearer ${newToken}`},
@@ -25,7 +28,7 @@ export default function useAuthFetch() {
                 return response;
             }
         } catch (error) {
-            setAccessToken("");
+            updateAndSetAccessToken("");
             throw error;
         }
     };

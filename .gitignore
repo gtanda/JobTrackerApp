@@ -257,3 +257,4 @@ nunit-*.xml
 .idea/
 
 *.txt
+docs/*

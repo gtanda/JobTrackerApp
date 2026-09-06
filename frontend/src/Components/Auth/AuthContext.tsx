@@ -2,11 +2,13 @@
 
 interface AuthContextType {
     accessToken: string,
-    setAccessToken: (accessToken: string) => void,
+    updateAndSetAccessToken: (accessToken: string) => void,
+    getAccessToken: () => string,
 }
 
 export const AuthContext = createContext<AuthContextType>({
     accessToken: '',
-    setAccessToken: () => {
-    }
+    updateAndSetAccessToken: () => {
+    },
+    getAccessToken: () => ''
 });

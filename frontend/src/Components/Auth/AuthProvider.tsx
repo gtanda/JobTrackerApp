@@ -1,9 +1,19 @@
-﻿import {useEffect, useState} from "react";
-import { AuthContext } from "./AuthContext";
-import * as React from "react";
+﻿import * as React from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {AuthContext} from "./AuthContext";
 
-export default function AuthProvider ({children} : {children: React.ReactNode}) {
-    const [accessToken, setAccessToken] =useState('');
+export default function AuthProvider({children}: { children: React.ReactNode }) {
+    const [accessToken, setAccessToken] = useState('');
+    const accessTokenRef = useRef('');
+
+    const updateAndSetAccessToken = useCallback((accessToken: string) => {
+        accessTokenRef.current = accessToken;
+        setAccessToken(accessTokenRef.current);
+    }, []);
+
+    const getAccessToken = useCallback(() => {
+        return accessTokenRef.current
+    }, []);
 
     useEffect(() => {
         const refreshToken = async () => {
@@ -13,15 +23,15 @@ export default function AuthProvider ({children} : {children: React.ReactNode}) 
             });
             if (response.ok) {
                 const data = await response.json();
-                setAccessToken(data.accessToken);
+                updateAndSetAccessToken(data.accessToken);
             }
         }
         refreshToken()
-    }, []);
+    }, [updateAndSetAccessToken]);
 
 
     return (
-        <AuthContext.Provider value={{accessToken, setAccessToken}}>
+        <AuthContext.Provider value={{accessToken, updateAndSetAccessToken, getAccessToken}}>
             {children}
         </AuthContext.Provider>
     )

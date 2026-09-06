@@ -4,7 +4,7 @@ import {AuthContext} from "../Auth/AuthContext.tsx";
 
 
 export default function Login() {
-    const {setAccessToken} = useContext(AuthContext)
+    const {updateAndSetAccessToken} = useContext(AuthContext)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [errorState, setErrorState] = useState('');
@@ -19,7 +19,7 @@ export default function Login() {
         });
         if (response.ok) {
             const responseJson = await response.json()
-            setAccessToken(responseJson.accessToken);
+            updateAndSetAccessToken(responseJson.accessToken);
         } else {
             setErrorState("Login failed.");
         }
