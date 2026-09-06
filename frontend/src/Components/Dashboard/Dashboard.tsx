@@ -1,5 +1,5 @@
 ﻿import {useEffect, useState} from "react";
-import {fetchJobEntries} from "../../api/jobEntry.ts";
+import {deleteJobEntry, fetchJobEntries} from "../../api/jobEntry.ts";
 import type {JobEntry} from "../../types/jobEntry.ts";
 import JobEntryList from "./JobEntryList.tsx";
 import CreateJobEntryForm from "./CreateJobEntryForm.tsx";
@@ -31,13 +31,25 @@ export default function Dashboard() {
         loadEntries();
     }, [])
 
+    const handleJobEntryDelete = async (jobEntryId: string) => {
+        console.log(jobEntryId)
+
+        try {
+            await deleteJobEntry(jobEntryId, authFetch);
+            loadEntries();
+        } catch (err) {
+            console.error("Could not delete job entry", err);
+        }
+
+    }
+
     return (
         <>
             {error && <p>{error}</p>}
             {isLoading && <p>Loading...</p>}
             <p>You're logged in!</p>
             <CreateJobEntryForm onCreated={loadEntries}/>
-            <JobEntryList jobEntries={jobEntries}/>
+            <JobEntryList jobEntries={jobEntries} onDelete={handleJobEntryDelete}/>
         </>
     )
 }

@@ -17,3 +17,8 @@ export const createJobEntry = async (createJobEntry: CreateJobEntry, authFetch: 
 
     return response.json();
 }
+
+export const deleteJobEntry = async (jobId: string, authFetch: AuthFetchType) => {
+    const response = await authFetch(`/api/JobEntries/${jobId}`, {method: "DELETE",});
+    if (!response.ok) throw new Error("Could not delete job entries");
+}

@@ -1,6 +1,6 @@
 ﻿import {useContext} from "react";
 import {AuthContext} from "./AuthContext.tsx";
-import {getFreshAccessToken} from "../../api/authFetch.ts";
+import {getFreshAccessToken} from "../../api/authToken.ts";
 
 export type AuthFetchType = (path: string, options: RequestInit) => Promise<Response>;
 
